@@ -58,6 +58,7 @@ class Bishop:public Piece {
 public:
 	Bishop(char newColor) :Piece(newColor) {}
 private:
+	//Note to later, check diagonal moves, for each up, for each sideways, check that up-sideways > 0 and otherway around  if sideways > up
 	virtual char GetPiece() {
 		return 'B';
 	}
