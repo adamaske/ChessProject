@@ -97,13 +97,14 @@ void Move() {
         std::cout << "\nYou wanted to move to: " << t_x << t_y;
         bool a = pieceToMove->LegalMove(pieces, t_x, t_y, x, y);
         if (a == true) {
-            pieces[x][y] = 0;
+            pieces[x][y] = NULL;
             pieces[t_x][t_y] = pieceToMove;
             std::cout << "\nThis move is legal\n";
             PrintBoard();
         }
         else {
             std::cout << "\nThis move is not legal";
+            system("pause");
         }
     }
     

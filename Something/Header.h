@@ -71,7 +71,7 @@ private:
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
 		//Can only move diagonaly so destHeight and destWidth has to be == 
-		if (destHeight == destWidth) {
+		if (destHeight - myHeight == destWidth - myWidth || destHeight - myHeight == myWidth - destWidth) {
 			return true;
 		}
 		return false;
