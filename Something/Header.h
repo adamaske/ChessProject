@@ -48,7 +48,7 @@ public:
 			direction = -1;
 		}
 		if (dest == 0) {
-			if (destHeight + direction == myHeight) {
+			if (destHeight + direction == myHeight && destWidth == myWidth) {
 				return true;
 			}
 		}
@@ -70,19 +70,9 @@ private:
 		return 'B';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		Piece* dest = board[destHeight][destWidth];
-		if (dest != 0) {
-			if (dest->GetColor() != GetColor()) {
-				if (destHeight == destWidth) {
-					return true;
-				}
-			}
-		}
-		else {
-			//Can only move diagonaly so destHeight and destWidth has to be == 
-			if (destHeight == destWidth) {
-				return true;
-			}
+		//Can only move diagonaly so destHeight and destWidth has to be == 
+		if (destHeight == destWidth) {
+			return true;
 		}
 		return false;
 	}
@@ -96,31 +86,15 @@ private:
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
 		//Either destWidth or destHeight has to be 1/-1, then the other has to be one has to be +/-3
-		Piece* dest = board[destHeight][destWidth];
-		if (dest != 0) {
-			if (dest->GetColor() != GetColor()) {
-				if (myHeight == destHeight + 1 || myHeight == destHeight - 1) {
-					if (myWidth == destWidth + 2 || myWidth == destWidth - 2) {
-						return true;
-					}
-				}else if(myHeight == destHeight + 2 || myHeight == destHeight - 2) {
-					if (myWidth == destWidth + 1 || myWidth == destWidth - 1) {
-						return true;
-					}
-				}
+		if (myHeight == destHeight + 1 || myHeight == destHeight - 1) {
+			if (myWidth == destWidth + 2 || myWidth == destWidth - 2) {
+				return true;
 			}
 		}
-		else {
-			if (myHeight == destHeight+1 || myHeight == destHeight - 1) {
-				if (myWidth == destWidth+2 || myWidth == destWidth-2) {
-					return true;
-				}
-			}else if (myHeight == destHeight + 2 || myHeight == destHeight - 2) {
-				if (myWidth == destWidth + 1 || myWidth == destWidth - 1) {
-					return true;
-				}
+		else if (myHeight == destHeight + 2 || myHeight == destHeight - 2) {
+			if (myWidth == destWidth + 1 || myWidth == destWidth - 1) {
+				return true;
 			}
-			
 		}
 		return false;
 	}
@@ -133,7 +107,10 @@ private:
 		return 'R';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		return true;
+		if (myHeight == destHeight || myWidth == destWidth) {
+			return true;
+		}
+		return false;
 	}
 };
 class Queen:public Piece {
@@ -144,7 +121,13 @@ private:
 		return 'Q';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		return true;
+		if (myHeight == destHeight || myWidth == destWidth) {
+			return true;
+		}
+		else if (destHeight == destWidth) {
+			return true;
+		}
+		return false;
 	}
 };
 class King:public Piece {
@@ -155,28 +138,16 @@ private:
 		return 'K';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		Piece* destPiece = board[destHeight][destWidth];
-		if (destPiece != 0) {
-			if (destPiece->GetColor() != GetColor()) {
-				if (myHeight == destHeight - 1 || myHeight == destHeight + 1 || myHeight == destHeight) {
-					if (myWidth == destWidth - 1 || myWidth == destWidth + 1 || myWidth == destWidth) {
-						return true;
-					}
-				}
-			}
-		}
-		else {
-			if (myHeight == destHeight - 1 || myHeight == destHeight + 1 || myHeight == destHeight) {
-				if (myWidth == destWidth - 1 || myWidth == destWidth + 1 || myWidth == destWidth) {
-					return true;
-				}
+		if (myHeight == destHeight - 1 || myHeight == destHeight + 1 || myHeight == destHeight) {
+			if (myWidth == destWidth - 1 || myWidth == destWidth + 1 || myWidth == destWidth) {
+				return true;
 			}
 		}
 		return true;
 	}
 };
 
-
-
 Piece* pieces[height][width];
+
+
 
