@@ -7,8 +7,15 @@ const int height = 8;
 
 void PrintBoard();
 void CreateBoard();
+void MakeMove(int, int, int, int);
 void Move();
-
+void StartGame();
+bool IsCheck(char);
+bool AnyValidMoves(char);
+char REPICKPIECE = 'N';
+bool GameOver();
+void NextPlayer();
+char player = WHITE;
 class Piece {
 public:
 	Piece(char newColor):myColor(newColor){}
@@ -149,5 +156,5 @@ private:
 
 Piece* pieces[height][width];
 
-
+std::vector<std::string> previousMoves;
 
