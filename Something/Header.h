@@ -16,7 +16,7 @@ char REPICKPIECE = 'N';
 bool GameOver();
 void NextPlayer();
 char player = WHITE;
-bool playingVersusAI = true;
+bool playingVersusAI = false;
 std::string AIMove(char);
 int minimax(char);
 std::vector<std::string> previousMoves;
