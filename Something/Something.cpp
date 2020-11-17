@@ -51,7 +51,7 @@ void CreateBoard() {
             }
             //Second and second last rows are pawns
             if (i == 1 || i == height - 2) {
-                pieces[i][k] = new Pawn(color);
+               pieces[i][k] = new Pawn(color);
             }
         }
     }
@@ -126,6 +126,18 @@ void Move() {
         }
     }*/
 
+    if (playingVersusAI && player == BLACK) {
+        std::string answer = AIMove(BLACK);
+        int x = answer[0];
+        int y = answer[1];
+        int t_x = answer[2];
+        int t_y = answer[3];
+        Piece* toMove = pieces[x][y];
+        pieces[t_x][t_y] = toMove;
+        pieces[x][y] = NULL;
+        return;
+    }
+
     std::string input;
     Piece* pieceToMove = NULL;
     Piece* temp = NULL;
@@ -134,6 +146,7 @@ void Move() {
     int y = 0;
     int t_x = 0;
     int t_y = 0;
+    std::string turn = (player == WHITE) ? "WHITE" : "BLACK";
     while (true) {
         switch (state)
         {
@@ -141,6 +154,8 @@ void Move() {
             system("cls");
             PrintBoard();
             //Ask for what piece to move
+            std::cout << "\nIt is " << turn << "'s turn to move!\n\n";
+            
             std::cout << "\nWhat pawn to move?\n";
 
             getline(std::cin, input);
@@ -183,17 +198,18 @@ void Move() {
             t_y = input[1] - '0';
             if (!pieces[x][y]->LegalMove(pieces, t_x, t_y, x, y)) {
                 std::cout << "This is an illegal move!";
+                system("pause");
                 break;
             }
             //Move it and check the move dont set you i check
-            temp = pieces[x][y];
-            pieces[x][y] = 0;
+            temp = pieces[t_x][t_y];
+            pieces[x][y] = NULL;
             pieces[t_x][t_y] = pieceToMove;
             if (IsCheck(player)) {
                 //Undo move and give error message
                 pieces[x][y] = pieceToMove;
                 pieces[t_x][t_y] = temp;
-                std::cout << "This move would set you in check, illegal!";
+                std::cout << "This move would set you in check, illegal!\n";
                 system("pause");
                 break;
             }
@@ -241,6 +257,8 @@ bool IsCheck(char color) {
             if (pieces[i][k] != 0) {
                 if (pieces[i][k]->GetColor() != color) {
                     if (pieces[i][k]->LegalMove(pieces, kingX, kingY, i,k)) {
+                        std::cout << "This piece" << i << k << "has you king in check, with king pos at" << kingX << kingY;
+                        system("pause");
                         return true;
                     }
                 }
@@ -269,7 +287,9 @@ bool AnyValidMoves(char color) {
                             Piece* piece = pieces[j][p];
                             pieces[j][p] = pieces[i][k];
                             pieces[i][k] = 0;
-                            if (!IsCheck(color)) {
+                            bool k = IsCheck(color);
+                            if (!k) {
+                                //Undo move
                                 pieces[i][k] = pieces[j][p];
                                 pieces[j][p] = piece;
                                 return true;
@@ -311,5 +331,128 @@ bool GameOver() {
     }
     else {
         return false;
+    }
+}
+
+
+std::string AIMove(char color) {
+    int bestScore = -100;
+    std::string bestMove = "";
+    std::string bestPiece = "";
+    Piece* temp = 0;
+    for (int i = 0; i < height; i++)
+    {
+        for (int k = 0; k < width; k++)
+        {
+            //Check if this piece is my color
+            if (pieces[i][k] != 0) {
+                if (pieces[i][k]->GetColor() == color) {
+                    system("pause");
+                    for (int j = 0; j < height; j++)
+                    {
+                        for (int p = 0; p < width; p++) {
+                            if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
+                                temp = pieces[j][p];
+                                pieces[j][p] = pieces[i][k];
+                                pieces[i][k] = 0;
+                                int score = minimax(BLACK);
+                                pieces[i][k] = pieces[j][p];
+                                pieces[j][p] = temp;
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestPiece[0] = i;
+                                    bestPiece[1] = k;
+                                    bestMove[0] = j;
+                                    bestMove[1] = p;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    return bestPiece+bestMove;
+}
+
+int minimax(char color) {
+    int result = -10;
+    if (!AnyValidMoves) {
+        //If the current player is in check, its a checkmate, else its a draw
+        if (IsCheck(BLACK)) {
+            //AI in checkMate
+            result = -1;
+            return result;
+        }
+        else if(IsCheck(WHITE)){
+            //WHite lost
+            result = 1;
+            return result;
+        }
+        else {
+            //Draw
+            result = 0;
+            return result;
+        }
+    }
+    Piece* temp;
+    if (color == BLACK) {
+        int bestScore = -100;
+        for (int i = 0; i < height; i++)
+        {
+            for (int k = 0; k < width; k++)
+            {
+                //Check if this piece is my color
+                if (pieces[i][k]->GetColor() == color) {
+                    for (int j = 0; j < height; j++)
+                    {
+                        for (int p = 0; p < width; p++) {
+                            if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
+                                temp = pieces[j][p];
+                                pieces[j][p] = pieces[i][k];
+                                pieces[i][k] = 0;
+                                int score = minimax(BLACK);
+                                pieces[i][k] = pieces[j][p];
+                                pieces[j][p] = temp;
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return bestScore;
+    }
+    else {
+        int bestScore = 100;
+        for (int i = 0; i < height; i++)
+        {
+            for (int k = 0; k < width; k++)
+            {
+                //Check if this piece is my color
+                if (pieces[i][k]->GetColor() == WHITE) {
+                    for (int j = 0; j < height; j++)
+                    {
+                        for (int p = 0; p < width; p++) {
+                            if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
+                                temp = pieces[j][p];
+                                pieces[j][p] = pieces[i][k];
+                                pieces[i][k] = 0;
+                                int score = minimax(WHITE);
+                                pieces[i][k] = pieces[j][p];
+                                pieces[j][p] = temp;
+                                if (score < bestScore) {
+                                    bestScore = score;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return bestScore;
     }
 }

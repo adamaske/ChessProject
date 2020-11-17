@@ -16,6 +16,10 @@ char REPICKPIECE = 'N';
 bool GameOver();
 void NextPlayer();
 char player = WHITE;
+bool playingVersusAI = true;
+std::string AIMove(char);
+int minimax(char);
+std::vector<std::string> previousMoves;
 class Piece {
 public:
 	Piece(char newColor):myColor(newColor){}
@@ -37,6 +41,9 @@ private:
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) = 0;
 	char myColor;
 };
+
+Piece* pieces[height][width];
+
 class Pawn :public Piece {
 public:
 	Pawn(char newColor) :Piece(newColor) {}
@@ -78,7 +85,17 @@ private:
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
 		//Can only move diagonaly so destHeight and destWidth has to be == 
-		if (destHeight - myHeight == destWidth - myWidth || destHeight - myHeight == myWidth - destWidth) {
+		if ((destWidth - myWidth == destHeight - myHeight) || (destWidth - myWidth == myHeight - destHeight)) {
+			int xDir = (destHeight - myHeight > 0) ? 1 : -1;
+			int yDir = (destWidth - myWidth > 0) ? 1 : -1;
+			int k;
+			int i;
+			for (i = myHeight + xDir, k = myWidth + yDir; i != destHeight; i = i + xDir, k = k + yDir)
+			{
+				if (board[i][k] != 0) {
+					return false;
+				}
+			}
 			return true;
 		}
 		return false;
@@ -89,7 +106,7 @@ public:
 	Knight(char newColor):Piece(newColor){}
 private:
 	virtual char GetPiece() {
-		return 'K';
+		return 'k';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
 		//Either destWidth or destHeight has to be 1/-1, then the other has to be one has to be +/-3
@@ -114,7 +131,38 @@ private:
 		return 'R';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		if (myHeight == destHeight || myWidth == destWidth) {
+		//if only move sideways
+		if (myHeight == destHeight) {
+			//Find what direction its moving
+			int dir = 0;
+			if (myWidth - destWidth > 0) {
+				dir = 1;
+			}
+			else {
+				dir = -1;
+			}
+			//myWidth + dir in init to not check its own place, wich would return false
+			for (int pos = myWidth + dir; pos != destWidth; pos = pos + dir) {
+				if (board[myHeight][pos] != 0) {
+					return false;
+				}
+			}
+			return true;
+		}
+		//If only move vertical
+		if (myWidth == destWidth) {
+			int dir = 0;
+			if (myHeight - destHeight > 0) {
+				dir = 1;
+			}
+			else {
+				dir = -1;
+			}
+			for (int pos = myHeight + dir; pos != destHeight; pos = pos + dir) {
+				if (board[myHeight][pos] != 0) {
+					return false;
+				}
+			}
 			return true;
 		}
 		return false;
@@ -128,13 +176,54 @@ private:
 		return 'Q';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		if (myHeight == destHeight || myWidth == destWidth) {
+		//if only move sideways
+		if (myHeight == destHeight) {
+			//Find what direction its moving
+			int dir = 0;
+			if (myWidth - destWidth > 0) {
+				dir = 1;
+			}
+			else {
+				dir = -1;
+			}
+			//myWidth + dir in init to not check its own place, wich would return false
+			for (int pos = myWidth + dir; pos != destWidth; pos = pos + dir) {
+				if (board[myHeight][pos] != 0) {
+					return false;
+				}
+			}
 			return true;
 		}
-		else if (destHeight == destWidth) {
+		//If only move vertical
+		if (myWidth == destWidth) {
+			int dir = 0;
+			if (myHeight - destHeight > 0) {
+				dir = 1;
+			}
+			else {
+				dir = -1;
+			}
+			for (int pos = myHeight + dir; pos != destHeight; pos = pos + dir) {
+				if (board[myHeight][pos] != 0) {
+					return false;
+				}
+			}
 			return true;
 		}
-		return false;
+		//Check if it moves diagonally
+		if ((destWidth - myHeight == destHeight - myHeight) || (destWidth - myHeight == myHeight - destHeight)) {
+			int xDir = (destHeight - myHeight > 0) ? 1 : -1;
+			int yDir = (destWidth - myWidth > 0) ? 1 : -1;
+			int k = 0;
+			for (int i = myHeight + xDir, k = myWidth + yDir; i != destHeight; i = i + xDir, k = k + yDir)
+			{
+				if (board[i][k] != 0) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 };
 class King:public Piece {
@@ -145,16 +234,17 @@ private:
 		return 'K';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
-		if (myHeight == destHeight - 1 || myHeight == destHeight + 1 || myHeight == destHeight) {
-			if (myWidth == destWidth - 1 || myWidth == destWidth + 1 || myWidth == destWidth) {
-				return true;
-			}
+		int deltaX = destHeight - myHeight;
+		int deltaY = destWidth - myWidth;
+		if ((deltaX >= -1 && deltaX <= 1) && (deltaY >= -1 && deltaY <= 1)) {
+			return true;
 		}
-		return true;
+		else {
+			return false;
+		}
 	}
 };
 
-Piece* pieces[height][width];
 
-std::vector<std::string> previousMoves;
+
 
