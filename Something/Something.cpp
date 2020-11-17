@@ -345,9 +345,8 @@ std::string AIMove(char color) {
         for (int k = 0; k < width; k++)
         {
             //Check if this piece is my color
-            if (pieces[i][k] != 0) {
+            if (pieces[i][k] != NULL) {
                 if (pieces[i][k]->GetColor() == color) {
-                    system("pause");
                     for (int j = 0; j < height; j++)
                     {
                         for (int p = 0; p < width; p++) {
@@ -365,6 +364,7 @@ std::string AIMove(char color) {
                                     bestMove[0] = j;
                                     bestMove[1] = p;
                                 }
+                                delete temp;
                             }
                         }
                     }
@@ -403,27 +403,32 @@ int minimax(char color) {
         {
             for (int k = 0; k < width; k++)
             {
-                //Check if this piece is my color
-                if (pieces[i][k]->GetColor() == color) {
-                    for (int j = 0; j < height; j++)
-                    {
-                        for (int p = 0; p < width; p++) {
-                            if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
-                                temp = pieces[j][p];
-                                pieces[j][p] = pieces[i][k];
-                                pieces[i][k] = 0;
-                                int score = minimax(BLACK);
-                                pieces[i][k] = pieces[j][p];
-                                pieces[j][p] = temp;
-                                if (score > bestScore) {
-                                    bestScore = score;
+                if (pieces[i][k] != NULL) {
+                    //Check if this piece is my color
+                    if (pieces[i][k]->GetColor() == color) {
+                        for (int j = 0; j < height; j++)
+                        {
+                            for (int p = 0; p < width; p++) {
+                                if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
+                                    temp = pieces[j][p];
+                                    pieces[j][p] = pieces[i][k];
+                                    pieces[i][k] = 0;
+                                    int score = minimax(BLACK);
+                                    pieces[i][k] = pieces[j][p];
+                                    pieces[j][p] = temp;
+                                    if (score > bestScore) {
+                                        bestScore = score;
+                                    }
+                                    delete temp;
                                 }
                             }
                         }
                     }
                 }
+                
             }
         }
+        
         return bestScore;
     }
     else {
@@ -432,27 +437,32 @@ int minimax(char color) {
         {
             for (int k = 0; k < width; k++)
             {
-                //Check if this piece is my color
-                if (pieces[i][k]->GetColor() == WHITE) {
-                    for (int j = 0; j < height; j++)
-                    {
-                        for (int p = 0; p < width; p++) {
-                            if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
-                                temp = pieces[j][p];
-                                pieces[j][p] = pieces[i][k];
-                                pieces[i][k] = 0;
-                                int score = minimax(WHITE);
-                                pieces[i][k] = pieces[j][p];
-                                pieces[j][p] = temp;
-                                if (score < bestScore) {
-                                    bestScore = score;
+                if (pieces[i][k] != NULL) {
+                    //Check if this piece is my color
+                    if (pieces[i][k]->GetColor() == WHITE) {
+                        for (int j = 0; j < height; j++)
+                        {
+                            for (int p = 0; p < width; p++) {
+                                if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
+                                    temp = pieces[j][p];
+                                    pieces[j][p] = pieces[i][k];
+                                    pieces[i][k] = 0;
+                                    int score = minimax(WHITE);
+                                    pieces[i][k] = pieces[j][p];
+                                    pieces[j][p] = temp;
+                                    if (score < bestScore) {
+                                        bestScore = score;
+                                    }
+                                    delete temp;
                                 }
                             }
                         }
                     }
                 }
+                
             }
         }
+       
         return bestScore;
     }
 }
