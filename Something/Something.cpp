@@ -11,12 +11,10 @@ int main()
 void StartGame() {
     player = WHITE;
     CreateBoard();
-    Move();
     while (!GameOver()) {
         Move();
         NextPlayer();
     }
-    Move();
 }
 
 void CreateBoard() {
@@ -92,54 +90,7 @@ void PrintBoard() {
 }
 
 void Move() {
-    /*while (true) {
-        system("cls");
-        PrintBoard();
-
-        std::string input;
-        std::cout << "\nWhat pawn to move?\n";
-
-        getline(std::cin, input);
-
-        int x = input[0] - '0';
-        int y = input[1] - '0';
-
-        Piece* pieceToMove = pieces[x][y];
-        std::cout << "This is a " << pieceToMove->GetPiece() << "Which is a " << pieceToMove->GetColor() << "\n";
-
-        std::cout << "Where to move it?\n";
-        getline(std::cin, input);
-        int t_x = input[0] - '0';
-        int t_y = input[1] - '0';
-
-        std::cout << "\nYou wanted to move to: " << t_x << t_y;
-        bool a = pieceToMove->LegalMove(pieces, t_x, t_y, x, y);
-        if (a == true) {
-            pieces[x][y] = NULL;
-            pieces[t_x][t_y] = pieceToMove;
-            MakeMove(x, y, t_x, t_y);
-            std::cout << "\nThis move is legal\n";
-            PrintBoard();
-        }
-        else {
-            std::cout << "\nThis move is not legal";
-            system("pause");
-        }
-    }*/
-
-    /*if (playingVersusAI && player == BLACK) {
-        std::string answer = AIMove(BLACK);
-        int x = answer[0];
-        int y = answer[1];
-        int t_x = answer[2];
-        int t_y = answer[3];
-        Piece* toMove = pieces[x][y];
-        pieces[t_x][t_y] = toMove;
-        pieces[x][y] = NULL;
-        return;
-    }*/
-
-    std::string input;
+    std::string input = "";
     Piece* pieceToMove = NULL;
     Piece* temp = NULL;
     int state = 0;
@@ -148,7 +99,8 @@ void Move() {
     int t_x = 0;
     int t_y = 0;
     std::string turn = (player == WHITE) ? "WHITE" : "BLACK";
-    while (true) {
+    bool asking = true;
+    while (asking) {
         switch (state)
         {
         case 0:
@@ -215,15 +167,15 @@ void Move() {
                 break;
             }
             MakeMove(x, y, t_x, t_y);
-            state = 0;
+            state = 3;
+            asking = false;
             //If it gets to this state, return the whole function
             return;
         default:
+            return;
             break;
         }
     }
-    
-    
 }
 
 void MakeMove(int fromX, int fromY, int toX, int toY) {
@@ -233,8 +185,8 @@ void MakeMove(int fromX, int fromY, int toX, int toY) {
 
 bool IsCheck(char color) {
     //Get king x and y
-    int kingX;
-    int kingY;
+    int kingX = 0;
+    int kingY = 0;
 
     for (int i = 0; i < height; i++)
     {
@@ -270,26 +222,27 @@ bool IsCheck(char color) {
 }
 bool AnyValidMoves(char color) {
     //Check every piece
+    Piece* piece = NULL;
     for (int i = 0; i < height; i++)
     {
-        for (int k = 0; k < height; k++)
+        for (int k = 0; k < width; k++)
         {
-            if (pieces[i][k] != NULL) {
+            if (pieces[i][k] != 0) {
                 //Is it correct color
                 if (pieces[i][k]->GetColor() == color)
                 {
-                    system("pause");
                     //Go through every place on the board
                     for (int j = 0; j < height; j++)
                     {
-                        for (int p = 0; p < height; p++)
+                        for (int p = 0; p < width; p++)
                         {
                             //If this is a legal move, check for check
                             if (pieces[i][k]->LegalMove(pieces, j, p, i, k)) {
+                                return true;
                                 //Move for checking if its in check and undo
-                                Piece* piece = pieces[j][p];
+                                piece = pieces[j][p];
                                 pieces[j][p] = pieces[i][k];
-                                pieces[i][k] = 0;
+                                pieces[i][k] = NULL;
                                 bool k = IsCheck(color);
                                 if (!k) {
                                     //Undo move
@@ -369,7 +322,6 @@ std::string AIMove(char color) {
                                     bestMove[0] = j;
                                     bestMove[1] = p;
                                 }
-                                delete temp;
                             }
                         }
                     }
@@ -473,4 +425,5 @@ int minimax(char color) {
        
         return bestScore;
     }
+    return 0;
 }
