@@ -334,7 +334,7 @@ bool GameOver() {
     }
 }
 
-
+//NEd her er AI
 std::string AIMove(char color) {
     int bestScore = -100;
     std::string bestMove = "";
