@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <vector>
 #define WHITE 'W'
 #define BLACK 'B'
@@ -46,27 +47,41 @@ Piece* pieces[height][width];
 
 class Pawn :public Piece {
 public:
+	bool hasDoneFirstMove = false;
 	Pawn(char newColor) :Piece(newColor) {}
 	virtual char GetPiece() {
 		return 'P';
 	}
 	virtual bool ValidMove(Piece* board[height][width], int destHeight, int destWidth, int myHeight, int myWidth) {
 		//Check if the target destination is a NULL(no piece there), if so check only +/-(depening on color)1 on height
-		//Black should me +1, white -1
+		//Black should be +1, white -1
 		Piece* dest = board[destHeight][destWidth];
 		int direction = 0;
+		int steps = 1;
 		if (GetColor() == WHITE) {
 			direction = 1;
 		}
 		else if(GetColor() == BLACK){
 			direction = -1;
 		}
+		std::cout << "Steps set to 2";
+		//Find if it wants to move straight down
+		if(!hasDoneFirstMove){
+			steps = 2;
+			
+		}
+		//If there is no piece at the desired destionation, check if it is at the same width, 
+		//then find if youre allowed to move there based on the direction and steps allowed
 		if (dest == 0) {
-			if (destHeight + direction == myHeight && destWidth == myWidth) {
+			if (destHeight + (direction * steps)== myHeight && destWidth == myWidth) {
+				if(!hasDoneFirstMove){
+					hasDoneFirstMove = true;
+				}
 				return true;
 			}
 		}
 		else if (dest != 0) {
+			//Dest is not null here, so the pawn can take a diagonal pawn
 			//Check if its a +/-1 height, and +/-1 width, then take it
 			if (destHeight + direction == myHeight && (destWidth + 1 == myWidth || destWidth - 1 == myWidth)) {
 				return true;

@@ -18,7 +18,7 @@ void StartGame() {
 }
 
 void CreateBoard() {
-    for (int i = 0; i < height; i++) {
+    for (int i = 0; i < height; i++) { 
         for (int k = 0; k < width; k++)
         {
             char color;
@@ -61,14 +61,12 @@ void PrintBoard() {
         std::cout << i <<"|";
         for (int k = 0; k < width; k++)
         {
-            Piece* a = pieces[i][k];
-            if (a != 0) {
-                std::cout << a->GetPiece() << "|";
+            if (pieces[i][k]) {
+                std::cout << pieces[i][k]->GetPiece() << "|";
             }
             else {
                 std::cout << " |";
             }
-
         }
 
         if (i == 0) {
@@ -93,6 +91,7 @@ void Move() {
     std::string input = "";
     Piece* pieceToMove = NULL;
     Piece* temp = NULL;
+    //State 0 is for choosing the peice to move, State == 1 is for moving it
     int state = 0;
     int x = 0;
     int y = 0;
@@ -117,7 +116,7 @@ void Move() {
             y = input[1] - '0';
 
             //Check if its a valid piece
-            if (pieces[x][y] == NULL) {
+            if (pieces[x][y] == nullptr) {
                 std::cout << "This is not a piece!\n";
                 system("pause");
                 break;
@@ -154,9 +153,10 @@ void Move() {
                 system("pause");
                 break;
             }
+
             //Move it and check the move dont set you i check
             temp = pieces[t_x][t_y];
-            pieces[x][y] = NULL;
+            pieces[x][y] = nullptr;
             pieces[t_x][t_y] = pieceToMove;
             if (IsCheck(player)) {
                 //Undo move and give error message
@@ -166,6 +166,12 @@ void Move() {
                 system("pause");
                 break;
             }
+            //Delete old piece
+            if(temp != nullptr){
+                    std::cout << "You took a piece";
+                    system("pause");
+            }
+            
             MakeMove(x, y, t_x, t_y);
             state = 3;
             asking = false;
